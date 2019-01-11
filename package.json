@@ -1,0 +1,19 @@
+{
+  "name": "convert-videos-to-jpegs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node index.js"
+  },
+  "author": "Tiffany Poss",
+  "license": "MIT",
+  "dependencies": {
+    "capture-frame": "^2.0.1",
+    "ffmpeg": "0.0.4",
+    "ffmpeg-extract-frame": "^1.0.1",
+    "fs-extra": "^7.0.1",
+    "readdir-enhanced": "^2.2.4",
+    "video-screen": "0.0.1"
+  }
+}
