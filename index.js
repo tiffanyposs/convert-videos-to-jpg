@@ -1,7 +1,8 @@
-var fs = require('fs');
+const fs = require('fs');
 const fse = require('fs-extra');
-var ffmpeg = require('ffmpeg');
+const ffmpeg = require('ffmpeg');
 const readdir = require('readdir-enhanced');
+const chalk = require('chalk');
 
 /**
 	* Directory of the videos to process
@@ -23,6 +24,23 @@ const VIDEO_DIR_CLONE = `./build/videos-clone`;
 */
 const JPEG_DIR = './build/images';
 
+/** logs errors
+	* @name logError
+	* @type {Function}
+	* @param {msg} - message to display
+*/
+function logError(msg) {
+	console.log(chalk.bold.red(msg));
+}
+
+/** logs step in process
+	* @name logStep
+	* @type {Function}
+	* @param {msg} - message to display
+*/
+function logStep(msg) {
+	console.log(chalk.green(msg));
+}
 
 /** processes all folders and files in a directory to remove spaces in filenames
 	* @name removeSpacesFromDir
@@ -65,14 +83,14 @@ function createJpegFile(videoPath, cb) {
 				number : 1,
 			}, function (error, files) {
 				cb(files[files.length - 1])
-				if (error) console.log(error);
+				if (error) logError(error)
 			});
 		}, function (err) {
-			console.log('Error: ' + err);
+			logError('Error: ' + err);
 		});
 	} catch (e) {
-		console.log(e.code);
-		console.log(e.msg);
+		logError(e.code);
+		logError(e.msg);
 	}
 }
 
@@ -92,6 +110,8 @@ function correctImageName(imagePath) {
 	* @type {Function}
 */
 function init() {
+	logStep('Init build...');
+	logStep('Removing old build...');
 	if(fs.existsSync(JPEG_DIR)) {
 		fse.removeSync(JPEG_DIR);
 	}
@@ -101,17 +121,23 @@ function init() {
 	}
 
 	// make a clone of the original Video directory
+	logStep('Cloning video directory...');
 	fse.copySync(VIDEO_DIR, VIDEO_DIR_CLONE);
 
 	// remove spaces from directory
+	logStep('Removing spaces from directory...');
 	removeSpacesFromDir(VIDEO_DIR_CLONE);
 
+	logStep('Finding video files...');
 	const folders = readdir.sync(VIDEO_DIR_CLONE, { deep: true });
-	const videos = folders.filter(path => path.includes('.mp4') || path.includes('.mov')); // TODO: SELECT .mov files too
+	const videos = folders.filter(path => path.includes('.mp4') || path.includes('.mov'));
 
+	logStep('Creating jpegs...');
 	videos.forEach(video => {
 		createJpegFile(video, correctImageName);
 	});
+
+	logStep('Done! 😍')
 
 }
 
