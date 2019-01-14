@@ -3,6 +3,7 @@ const fse = require('fs-extra');
 const ffmpeg = require('ffmpeg');
 const readdir = require('readdir-enhanced');
 const chalk = require('chalk');
+const log = require('single-line-log').stdout;
 
 /**
 	* Directory of the videos to process
@@ -65,11 +66,23 @@ function removeSpacesFromDir(dir) {
 
 /**
 	* Create a jpeg from given movie file
-	* @name createJpegFile
+	* @name createJpegFiles
 	* @type {Function}
 	* @param {videoPath} - video path to convert into a jpeg
 */
-function createJpegFile(videoPath, cb) {
+function createJpegFiles(videoPaths, currentIndex) {
+	if (!currentIndex) currentIndex = 0;
+
+	const videoPath = videoPaths[currentIndex];
+
+	if (!videoPath) {
+		log.clear();
+		logStep('\nDone! 😍\n');
+		return;
+	};
+
+	log(`${Math.ceil((currentIndex / videoPaths.length)*100)}% Done \nCreating JPEG: ${videoPath}`);
+
 	let root = videoPath.split('/');
 	let fileName = root.pop();
 	fileName = fileName.split('.')[0];
@@ -82,8 +95,12 @@ function createJpegFile(videoPath, cb) {
 				frame_rate : 1,
 				number : 1,
 			}, function (error, files) {
-				cb(files[files.length - 1])
-				if (error) logError(error)
+				if (files) {
+					correctImageName(files[files.length - 1]);
+					currentIndex++;
+					createJpegFiles(videoPaths, currentIndex);
+				}
+				if (error) logError(error);
 			});
 		}, function (err) {
 			logError('Error: ' + err);
@@ -130,15 +147,11 @@ function init() {
 
 	logStep('Finding video files...');
 	const folders = readdir.sync(VIDEO_DIR_CLONE, { deep: true });
-	const videos = folders.filter(path => path.includes('.mp4') || path.includes('.mov'));
+	const videos = folders.filter(path => path.includes('.mp4'));
 
 	logStep('Creating jpegs...');
-	videos.forEach(video => {
-		createJpegFile(video, correctImageName);
-	});
 
-	logStep('Done! 😍')
-
+	createJpegFiles(videos);
 }
 
 init();
