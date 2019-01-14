@@ -10,20 +10,20 @@ const log = require('single-line-log').stdout;
 	* @name VIDEO_DIR
 	* @type {String}
 */
-const VIDEO_DIR = './videos';
+const VIDEO_DIR = 'videos';
 
 /**
 	* Directory of cloned video content
 	* @name VIDEO_DIR_CLONE
 	* @type {String}
 */
-const VIDEO_DIR_CLONE = `./build/videos-clone`;
+const VIDEO_DIR_CLONE = `build/videos-clone`;
 
 /** Directory of the output images
 	* @name JPEG_DIR
 	* @type {String}
 */
-const JPEG_DIR = './build/images';
+const JPEG_DIR = 'build/images';
 
 /** logs errors
 	* @name logError
